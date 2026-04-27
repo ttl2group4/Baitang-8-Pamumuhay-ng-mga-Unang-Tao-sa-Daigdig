@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pagtataya – AP8</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f0f4ff;
+    --card: #ffffff;
+    --primary: #2a52be;
+    --accent: #f5a623;
+    --correct: #27ae60;
+    --wrong: #e74c3c;
+    --text: #1a1a2e;
+    --muted: #7a7a9a;
+    --shadow: 0 8px 32px rgba(42,82,190,0.10);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(42,82,190,0.07) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(245,166,35,0.08) 0%, transparent 40%);
+  }
+
+  .container {
+    width: 100%;
+    max-width: 700px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--primary);
+    border-radius: 20px 20px 0 0;
+    padding: 28px 36px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -30px; left: 60px;
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    background: rgba(245,166,35,0.15);
+  }
+  .header-tag {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.6);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .header-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 30px;
+    color: #fff;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .header-title span { color: var(--accent); }
+
+  .progress-wrap {
+    margin-top: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .progress-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border-radius: 0 0 20px 20px;
+    box-shadow: var(--shadow);
+    padding: 36px;
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* SCREENS */
+  .screen { display: none; flex-direction: column; flex: 1; }
+  .screen.active { display: flex; animation: slideIn 0.4s ease; }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* MC QUESTION */
+  .q-type-badge {
+    display: inline-block;
+    background: rgba(42,82,190,0.1);
+    color: var(--primary);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+    width: fit-content;
+  }
+  .q-number {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .q-text {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 28px;
+    flex: 1;
+  }
+
+  .choices { display: flex; flex-direction: column; gap: 12px; }
+  .choice-btn {
+    background: #f7f8ff;
+    border: 2px solid #e0e4f5;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .choice-btn:hover:not(:disabled) {
+    background: rgba(42,82,190,0.07);
+    border-color: var(--primary);
+    transform: translateX(4px);
+  }
+  .choice-letter {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .choice-btn.correct {
+    background: rgba(39,174,96,0.1);
+    border-color: var(--correct);
+    color: var(--correct);
+  }
+  .choice-btn.correct .choice-letter { background: var(--correct); }
+  .choice-btn.wrong {
+    background: rgba(231,76,60,0.08);
+    border-color: var(--wrong);
+    color: var(--wrong);
+  }
+  .choice-btn.wrong .choice-letter { background: var(--wrong); }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-msg {
+    margin-top: 16px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    display: none;
+  }
+  .feedback-msg.correct { background: rgba(39,174,96,0.12); color: var(--correct); display: block; }
+  .feedback-msg.wrong   { background: rgba(231,76,60,0.10); color: var(--wrong);   display: block; }
+
+  /* SHORT ANSWER */
+  .sa-instruction {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+    background: #f7f8ff;
+    border-left: 4px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+  }
+  .sa-textarea {
+    width: 100%;
+    border: 2px solid #e0e4f5;
+    border-radius: 12px;
+    padding: 16px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: var(--text);
+    resize: vertical;
+    min-height: 130px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 16px;
+  }
+  .sa-textarea:focus { border-color: var(--primary); }
+
+  /* RUBRIC */
+  .rubric-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .rubric-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .rubric-table th {
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 10px;
+    text-align: center;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+  }
+  .rubric-table th:first-child { text-align: left; }
+  .rubric-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #eef0fa;
+    color: var(--text);
+    text-align: center;
+    line-height: 1.4;
+  }
+  .rubric-table td:first-child { text-align: left; font-weight: 700; color: var(--primary); }
+  .rubric-table tr:nth-child(even) td { background: #f7f8ff; }
+
+  /* BUTTONS */
+  .btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #1e3fa0; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(42,82,190,0.25); }
+  .btn-accent {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-accent:hover { background: #e09010; transform: translateY(-2px); }
+
+  .btn-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+    gap: 12px;
+  }
+
+  /* RESULTS */
+  .result-circle {
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--primary);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    margin: 0 auto 24px;
+    box-shadow: 0 8px 30px rgba(42,82,190,0.3);
+  }
+  .result-score { font-size: 40px; font-weight: 900; color: #fff; line-height: 1; }
+  .result-of { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 700; }
+  .result-msg { font-size: 22px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 8px; }
+  .result-sub { font-size: 14px; color: var(--muted); text-align: center; margin-bottom: 28px; }
+
+  .score-breakdown {
+    display: flex; gap: 16px; margin-bottom: 24px;
+  }
+  .score-box {
+    flex: 1;
+    background: #f7f8ff;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    border: 2px solid #e0e4f5;
+  }
+  .score-box-num { font-size: 28px; font-weight: 900; color: var(--primary); }
+  .score-box-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* INTRO */
+  .intro-icon { font-size: 56px; text-align: center; margin-bottom: 16px; }
+  .intro-title { font-family: 'Baloo 2', cursive; font-size: 26px; font-weight: 800; color: var(--text); text-align: center; margin-bottom: 8px; }
+  .intro-sub { font-size: 14px; color: var(--muted); text-align: center; line-height: 1.6; margin-bottom: 28px; }
+  .intro-details { display: flex; gap: 16px; margin-bottom: 28px; }
+  .intro-detail {
+    flex: 1; background: #f7f8ff; border-radius: 12px; padding: 14px; text-align: center; border: 2px solid #e0e4f5;
+  }
+  .intro-detail-num { font-size: 22px; font-weight: 900; color: var(--primary); }
+  .intro-detail-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="header-tag">Araling Panlipunan 8 · AP8HSK-Ie-5</div>
+    <div class="header-title">Pagtataya — <span>Pamumuhay ng mga<br>Unang Tao sa Daigdig</span></div>
+    <div class="progress-wrap">
+      <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 6</div>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <!-- INTRO -->
+    <div class="screen active" id="screen-intro">
+      <div class="intro-icon">📝</div>
+      <div class="intro-title">Handa ka na ba?</div>
+      <div class="intro-sub">Susubukin ang iyong kaalaman tungkol sa pamumuhay ng mga sinaunang tao. Basahin nang mabuti ang bawat tanong bago sumagot.</div>
+      <div class="intro-details">
+        <div class="intro-detail">
+          <div class="intro-detail-num">5</div>
+          <div class="intro-detail-label">Multiple Choice</div>
+        </div>
+        <div class="intro-detail">
+          <div class="intro-detail-num">1</div>
+          <div class="intro-detail-label">Short Answer</div>
+        </div>
+        <div class="intro-detail">
+          <div class="intro-detail-num">10</div>
+          <div class="intro-detail-label">Kabuuang Puntos</div>
+        </div>
+      </div>
+      <div class="btn-row" style="justify-content:center">
+        <button class="btn btn-primary" onclick="startQuiz()">Simulan ang Pagsusulit →</button>
+      </div>
+    </div>
+
+    <!-- MC QUESTIONS (screens 1–5) -->
+    <div class="screen" id="screen-mc"></div>
+
+    <!-- SHORT ANSWER -->
+    <div class="screen" id="screen-sa">
+      <div class="q-type-badge">✏️ Maikling Sagot — 5 Puntos</div>
+      <div class="q-text">Ipaliwanag kung paano nakatulong ang pagtuklas ng apoy sa pag-unlad ng pamumuhay ng mga sinaunang tao.</div>
+      <div class="sa-instruction">Sumulat ng <strong>3–5 pangungusap</strong>. Gamitin ang sariling mga salita at isaalang-alang ang nilalaman, organisasyon ng ideya, at wastong wika.</div>
+      <textarea class="sa-textarea" id="saAnswer" placeholder="Isulat ang iyong sagot dito..."></textarea>
+
+      <div class="rubric-title">📋 Rubrik ng Pagmamarka</div>
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th>Pamantayan</th>
+            <th>4</th><th>3</th><th>2</th><th>1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Nilalaman at Kawastuhan</td>
+            <td>Kumpleto at tumpak</td>
+            <td>Halos kumpleto</td>
+            <td>Ilang mali</td>
+            <td>Maraming mali</td>
+          </tr>
+          <tr>
+            <td>Organisasyon ng Ideya</td>
+            <td>Malinaw at maayos</td>
+            <td>May kalabuan</td>
+            <td>Nagkakalito</td>
+            <td>Walang organisasyon</td>
+          </tr>
+          <tr>
+            <td>Wika at Pagpapahayag</td>
+            <td>Wastong gramatika</td>
+            <td>Ilang pagkakamali</td>
+            <td>Maraming pagkakamali</td>
+            <td>Hindi maintindihan</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="btn-row">
+        <button class="btn btn-accent" onclick="submitSA()">Isumite ang Sagot →</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="screen" id="screen-result">
+      <div class="result-circle">
+        <div class="result-score" id="resultScore">0</div>
+        <div class="result-of">/ 5</div>
+      </div>
+      <div class="result-msg" id="resultMsg">Magaling!</div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="score-breakdown">
+        <div class="score-box">
+          <div class="score-box-num" id="mcScore">0</div>
+          <div class="score-box-label">Multiple Choice</div>
+        </div>
+        <div class="score-box">
+          <div class="score-box-num">✔</div>
+          <div class="score-box-label">Isinumite ang Short Answer</div>
+        </div>
+      </div>
+      <div style="background:#f7f8ff;border-radius:12px;padding:16px;font-size:13px;color:var(--muted);line-height:1.6;text-align:center;">
+        Ang maikling sagot ay susuriin ng guro batay sa rubrik. Ipagpatuloy ang pag-aaral! 📚
+      </div>
+      <div class="btn-row" style="justify-content:center;margin-top:20px">
+        <button class="btn btn-primary" onclick="restartQuiz()">🔄 Subukang Muli</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "Sino ang unang gumamit ng kasangkapang bato?",
+    choices: ["Homo Sapiens", "Homo Erectus", "Homo Habilis", "Neanderthal"],
+    answer: 2
+  },
+  {
+    q: "Ano ang natuklasan ng Homo Erectus?",
+    choices: ["Pagsasaka", "Apoy", "Pagsulat", "Metalurgo"],
+    answer: 1
+  },
+  {
+    q: "Ano ang katangian ng pamumuhay sa panahon ng Paleolitiko?",
+    choices: ["Sedentaryong pamumuhay", "Rebolusyong agrikultural", "Nomadikong pamumuhay", "Pagtatayo ng lungsod"],
+    answer: 2
+  },
+  {
+    q: "Ano ang pangunahing pagbabago sa panahon ng Neolitiko?",
+    choices: ["Pagtuklas ng apoy", "Rebolusyong agrikultural", "Paggamit ng metal", "Paglalayag"],
+    answer: 1
+  },
+  {
+    q: "Ano ang pagkakaiba ng hunter-gatherer sa agricultural lifestyle?",
+    choices: [
+      "Ang hunter-gatherer ay nagtatanim ng pananim",
+      "Ang hunter-gatherer ay may permanenteng tirahan",
+      "Ang hunter-gatherer ay umaasa sa pangangaso at pangangalap",
+      "Ang hunter-gatherer ay gumagamit ng metal na kagamitan"
+    ],
+    answer: 2
+  }
+];
+
+let currentQ = 0;
+let mcScore = 0;
+let answered = false;
+
+function updateProgress(current, total) {
+  const pct = (current / total) * 100;
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = current + ' / ' + total;
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  currentQ = 0;
+  mcScore = 0;
+  answered = false;
+  renderMC();
+  showScreen('screen-mc');
+  updateProgress(0, 6);
+}
+
+function renderMC() {
+  const q = questions[currentQ];
+  const letters = ['A', 'B', 'C', 'D'];
+  answered = false;
+
+  let choicesHTML = q.choices.map((c, i) =>
+    `<button class="choice-btn" id="choice-${i}" onclick="selectChoice(${i})">
+      <span class="choice-letter">${letters[i]}</span>${c}
+    </button>`
+  ).join('');
+
+  document.getElementById('screen-mc').innerHTML = `
+    <div class="q-type-badge">🔵 Multiple Choice — 1 Puntos</div>
+    <div class="q-number">Tanong ${currentQ + 1} ng 5</div>
+    <div class="q-text">${q.q}</div>
+    <div class="choices">${choicesHTML}</div>
+    <div class="feedback-msg" id="feedbackMsg"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="nextBtn" style="display:none" onclick="nextQuestion()">
+        ${currentQ < 4 ? 'Susunod na Tanong →' : 'Pumunta sa Maikling Sagot →'}
+      </button>
+    </div>
+  `;
+}
+
+function selectChoice(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[currentQ];
+  const btns = document.querySelectorAll('.choice-btn');
+  const fb = document.getElementById('feedbackMsg');
+
+  btns.forEach(b => b.disabled = true);
+
+  if (idx === q.answer) {
+    btns[idx].classList.add('correct');
+    fb.className = 'feedback-msg correct';
+    fb.textContent = '✅ Tama! Magaling!';
+    mcScore++;
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.answer].classList.add('correct');
+    fb.className = 'feedback-msg wrong';
+    fb.textContent = '❌ Mali. Ang tamang sagot: ' + q.choices[q.answer];
+  }
+
+  document.getElementById('nextBtn').style.display = 'block';
+  updateProgress(currentQ + 1, 6);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ < 5) {
+    renderMC();
+  } else {
+    showScreen('screen-sa');
+    updateProgress(5, 6);
+  }
+}
+
+function submitSA() {
+  const ans = document.getElementById('saAnswer').value.trim();
+  if (!ans) { alert('Mangyaring sumulat ng iyong sagot bago isumite.'); return; }
+
+  updateProgress(6, 6);
+  document.getElementById('resultScore').textContent = mcScore;
+  document.getElementById('mcScore').textContent = mcScore + '/5';
+
+  let msg, sub;
+  if (mcScore === 5) { msg = '🏆 Napakahusay!'; sub = 'Perpekto sa multiple choice! Ipagpatuloy ang kahusayan.'; }
+  else if (mcScore >= 3) { msg = '👏 Magaling!'; sub = 'Malapit ka na sa perpekto. Suriin ang mga napalampas.'; }
+  else { msg = '💪 Patuloy Magsikap!'; sub = 'Balikan ang aralin at subukang muli.'; }
+
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultSub').textContent = sub;
+  showScreen('screen-result');
+}
+
+function restartQuiz() {
+  updateProgress(0, 6);
+  showScreen('screen-intro');
+}
+</script>
+</body>
+</html>
